@@ -41,7 +41,7 @@ jobs:
 
       # Step 4: Build the project
       - name: Build the project
-        run: npm run deploy
+        run: npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
