@@ -32,7 +32,7 @@ function App() {
                    // Compile the program
                    const compiledOutput = program.compile();
                    const compiledPuzzle = compiledOutput.value.toString();
-
+                  console.log(compiledPuzzle)
 
            setByteCode(compiledOutput.value.toString());
 
