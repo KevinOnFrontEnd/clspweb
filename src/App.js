@@ -9,37 +9,25 @@ function App() {
   const { Program } = pkg;
 
   const handleCompile = () => {
-           // Parse the Chialisp source code
-        const program = Program.fromSource(source);
+    // Parse the Chialisp source code
+    const program = Program.fromSource(source);
 
+    if (curry !== "") {
+      const curryProgram = Program.fromSource(curry);
 
-        if(curry !== "")
-        {
-           const curryProgram = Program.fromSource(curry);
-           
-          //console.log(curryProgram);
-          // console.log(curryProgram);
-          // debugger;
-          const compiledOutput = program.run(curryProgram);    
-          setByteCode(compiledOutput.value.toString());
-          
-          //           //  const puzzleHash = compiledOutput.value.hashHex();
-          //           //  setPuzzleHash(puzzleHash);
-        }
-        else
-        {
+      const compiledOutput = program.run(curryProgram);
+      setByteCode(compiledOutput.value.toString());
+    } else {
+      // Compile the program
+      const compiledOutput = program.compile();
+      const compiledPuzzle = compiledOutput.value.toString();
+      console.log(compiledPuzzle);
 
-                   // Compile the program
-                   const compiledOutput = program.compile();
-                   const compiledPuzzle = compiledOutput.value.toString();
-                  console.log(compiledPuzzle)
+      setByteCode(compiledOutput.value.toString());
 
-           setByteCode(compiledOutput.value.toString());
-
-           const puzzleHash = compiledOutput.value.hashHex();
-           setPuzzleHash(puzzleHash);
-        }
-
+      const puzzleHash = compiledOutput.value.hashHex();
+      setPuzzleHash(puzzleHash);
+    }
   };
 
   const handleCopy = () => {
@@ -50,6 +38,11 @@ function App() {
 
   return (
     <div className="p-6 font-sans">
+      {/* Warning Banner */}
+      <div className="p-4 mb-6 text-center text-white bg-red-600 rounded-md">
+        ⚠️ This is a pre-alpha release and is not fully functional. Use at your own risk.
+      </div>
+
       {/* Top Section */}
       <div className="flex gap-4 mb-6">
         {/* Source Section */}
