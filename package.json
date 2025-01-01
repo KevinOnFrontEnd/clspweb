@@ -9,6 +9,7 @@
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1"
   },
+  "homepage": "https://clspweb.dev",
   "scripts": {
     "start": "concurrently \"npm run build:css\" \"react-scripts start\"",
     "build:css": "tailwindcss -i ./public/styles/App.css -o ./public/styles/site.css --watch",
