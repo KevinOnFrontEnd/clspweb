@@ -10,7 +10,7 @@ function App() {
   const [parameterType, setParameterType] = useState("Int");
   const [parameterValue, setParameterValue] = useState("");
   const [parameters, setParameters] = useState([]);
-  const [curry, setCurry] = useState("");
+  // const [curry, setCurry] = useState("");
   const { Program } = pkg;
 
   const handleCompile = () => {
@@ -23,8 +23,12 @@ function App() {
         var output = compiledSource.value.run(params);
         setByteCode(output.value.toString());
       } else {
-        var output = compiledSource.value.run();
+        var out = compiledSource.value.run();
+
+        setByteCode(out.value.toString());
       }
+
+      setPuzzleHash(compiledSource.value.toHex());
     } else {
       alert("No chialisp source code!");
     }
