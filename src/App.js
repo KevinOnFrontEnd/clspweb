@@ -16,37 +16,44 @@ function App() {
   const { Program } = pkg;
 
   const handleCompile = () => {
-    if (source !== "") {
-      const program = Program.fromSource(source);
-      let compiledSource = program.compile();
+    try {
+      if (source !== "") {
+        const program = Program.fromSource(source);
+        let compiledSource = program.compile();
 
-      setPuzzleHash(compiledSource.value.hashHex());
+        setPuzzleHash(compiledSource.value.hashHex());
 
-      if (curriedParameters.length > 0) {
-        const curriedParams = curriedParameters.map((param) => param.value);
+        if (curriedParameters.length > 0) {
+          const curriedParams = curriedParameters.map((param) => param.value);
 
-        //compile source
-        compiledSource = program.compile();
+          //compile source
+          compiledSource = program.compile();
 
-        //curry in parameters
-        compiledSource = compiledSource.value.curry(curriedParams);
-        setCompiledProgram(compiledSource.toString());
-      }
+          //curry in parameters
+          compiledSource = compiledSource.value.curry(curriedParams);
+          setCompiledProgram(compiledSource.toString());
+        }
 
-      if (parameters.length > 0) {
-        const values = parameters.map((param) => param.value);
-        const params = Program.fromList(values);
+        if (parameters.length > 0) {
+          const values = parameters.map((param) => param.value);
+          const params = Program.fromList(values);
 
-        const output = compiledSource.value.run(params);
-        setByteCode(compiledSource.value.toString());
-        setOutput(output.value.toString());
+          const output = compiledSource.value.run(params);
+          setCompiledProgram(compiledSource.value.toString());
+          setByteCode(compiledSource.value.toString());
+          setOutput(output.value.toString());
+        } else {
+          const output = compiledSource.run();
+          setByteCode(compiledSource.toString());
+          setOutput(output.value.toString());
+        }
       } else {
-        const output = compiledSource.run();
-        setByteCode(compiledSource.toString());
-        setOutput(output.value.toString());
+        alert("No chialisp source code!");
       }
-    } else {
-      alert("No chialisp source code!");
+    } catch (ex) {
+      setOutput(ex.toString());
+      setCompiledProgram("");
+      setPuzzleHash("");
     }
   };
 
@@ -81,7 +88,10 @@ function App() {
     <div className="font-sans flex flex-col min-h-screen bg-gray-100">
       {/* Top Bar */}
       <div className="bg-gray-800 text-white p-4 flex justify-between items-center shadow-md">
-        <h1 className="text-lg font-bold">Chialisp Editor</h1>
+        <div>
+          <h1 className="w-100 text-lg font-bold">clspweb.dev</h1>
+          <h2 className="text-sm text-green-300">Simple chialisp editor</h2>
+        </div>
         <button
           onClick={handleCompile}
           className="flex items-center px-6 py-2 bg-green-600 rounded-md hover:bg-green-700 transition duration-200"
@@ -95,8 +105,8 @@ function App() {
       <div className="flex-grow p-6 flex flex-col">
         {/* Warning Banner */}
         <div className="p-4 mb-6 text-center text-white bg-red-600 rounded-md">
-          ⚠️ This is a pre-alpha release and is not fully functional. Use at
-          your own risk.
+          ⚠️ This is a alpha release and is not fully functional. Use at your
+          own risk.
         </div>
 
         {/* Responsive Flex Container */}
