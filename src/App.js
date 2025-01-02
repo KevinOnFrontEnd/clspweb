@@ -1,168 +1,259 @@
 import React, { useState } from "react";
 import pkg from "clvm-lib";
-import { PlayIcon } from "@heroicons/react/24/solid";
+import { PlayIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 function App() {
   const [source, setSource] = useState("");
-
-  const [byteCode, setByteCode] = useState("");
+  const [_, setByteCode] = useState("");
   const [puzzleHash, setPuzzleHash] = useState("");
   const [parameterType, setParameterType] = useState("Int");
   const [parameterValue, setParameterValue] = useState("");
   const [parameters, setParameters] = useState([]);
-  // const [curry, setCurry] = useState("");
+  const [curriedParameters, setCurriedParameters] = useState([]); // Curried Parameters State
+  const [activeTab, setActiveTab] = useState("parameters"); // Tab State
+  const [output, setOutput] = useState(""); // Output State
+  const [compiledProgram, setCompiledProgram] = useState("");
   const { Program } = pkg;
 
   const handleCompile = () => {
     if (source !== "") {
       const program = Program.fromSource(source);
-      const compiledSource = program.compile();
+      let compiledSource = program.compile();
 
-      if (parameters.length > 0) {
-        const params = Program.fromList(parameters);
-        var output = compiledSource.value.run(params);
-        setByteCode(output.value.toString());
-      } else {
-        var out = compiledSource.value.run();
+      setPuzzleHash(compiledSource.value.hashHex());
 
-        setByteCode(out.value.toString());
+      if (curriedParameters.length > 0) {
+        const curriedParams = curriedParameters.map((param) => param.value);
+
+        //compile source
+        compiledSource = program.compile();
+
+        //curry in parameters
+        compiledSource = compiledSource.value.curry(curriedParams);
+        setCompiledProgram(compiledSource.toString());
       }
 
-      setPuzzleHash(compiledSource.value.toHex());
+      if (parameters.length > 0) {
+        const values = parameters.map((param) => param.value);
+        const params = Program.fromList(values);
+
+        const output = compiledSource.value.run(params);
+        setByteCode(compiledSource.value.toString());
+        setOutput(output.value.toString());
+      } else {
+        const output = compiledSource.run();
+        setByteCode(compiledSource.toString());
+        setOutput(output.value.toString());
+      }
     } else {
       alert("No chialisp source code!");
     }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(puzzleHash).then(() => {
-      alert("Puzzle Hash copied to clipboard!");
-    });
-  };
-
-  const handleAddParameter = () => {
+  const handleAddParameter = (isCurried) => {
     let newParameter = {};
-
-    console.log(parameterValue);
-    //text
     if (parameterType === "Text") {
-      newParameter = Program.fromText(parameterValue);
-    } else if (parameterType === "BigInt") {
-      //const val = BigInt(parameterValue);
-      //newParameter = Program.fromBigInt(parameterValue);
+      newParameter = { type: "Text", value: Program.fromText(parameterValue) };
     } else if (parameterType === "Int") {
       const val = parseInt(parameterValue);
-      newParameter = Program.fromInt(val);
+      if (isNaN(val)) return; //don't add the parameter if it's not a number
+      newParameter = { type: "Int", value: Program.fromInt(val) };
     }
 
-    setParameters([...parameters, newParameter]);
+    if (isCurried) {
+      setCurriedParameters([...curriedParameters, newParameter]);
+    } else {
+      setParameters([...parameters, newParameter]);
+    }
+
+    setParameterValue(""); // Reset input field
+  };
+
+  const handleRemoveParameter = (index, isCurried) => {
+    if (isCurried) {
+      setCurriedParameters(curriedParameters.filter((_, i) => i !== index));
+    } else {
+      setParameters(parameters.filter((_, i) => i !== index));
+    }
   };
 
   return (
-    <div className="p-6 font-sans">
-      {/* Warning Banner */}
-      <div className="p-4 mb-6 text-center text-white bg-red-600 rounded-md">
-        ⚠️ This is a pre-alpha release and is not fully functional. Use at your
-        own risk.
-      </div>
-
-      {/* Top Section */}
-      <div className="flex gap-4 mb-6">
-        {/* Source Section */}
-        <div className="flex-1">
-          <label htmlFor="source" className="block mb-2 font-bold text-lg">
-            Source
-          </label>
-          <textarea
-            id="source"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            placeholder="Enter source code..."
-            rows="20"
-            className="w-full p-4 text-base border border-gray-300 rounded-md resize-none"
-          />
-        </div>
-      </div>
-
-      {/* Parameters Section */}
-      <div className="mb-6">
-        <label htmlFor="parameters" className="block mb-2 font-bold text-lg">
-          Parameters
-        </label>
-        <div className="flex items-center gap-4">
-          <select
-            value={parameterType}
-            onChange={(e) => setParameterType(e.target.value)}
-            className="p-2 text-base border border-gray-300 rounded-md"
-          >
-            <option value="Int">Int</option>
-            <option value="Text">Text</option>
-          </select>
-          <input
-            type="text"
-            value={parameterValue}
-            onChange={(e) => setParameterValue(e.target.value)}
-            placeholder="Enter value"
-            className="flex-1 p-2 text-base border border-gray-300 rounded-md"
-          />
-          <button
-            onClick={handleAddParameter}
-            className="px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-          >
-            Add
-          </button>
-        </div>
-      </div>
-
-      {/* Compile Button */}
-      <div className="text-center mb-6">
+    <div className="font-sans flex flex-col min-h-screen bg-gray-100">
+      {/* Top Bar */}
+      <div className="bg-gray-800 text-white p-4 flex justify-between items-center shadow-md">
+        <h1 className="text-lg font-bold">Chialisp Editor</h1>
         <button
           onClick={handleCompile}
-          className="px-6 py-3 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          className="flex items-center px-6 py-2 bg-green-600 rounded-md hover:bg-green-700 transition duration-200"
         >
-          Compile
-        </button>
-        <button className="flex items-center px-4 py-2 bg-blue-500 text-white font-semibold rounded-md shadow hover:bg-blue-600 transition duration-200">
           <PlayIcon className="w-5 h-5 mr-2" />
           Run
         </button>
       </div>
 
-      {/* Byte Code Section */}
-      <div className="mb-6">
-        <label htmlFor="byteCode" className="block mb-2 font-bold text-lg">
-          Byte Code
-        </label>
-        <textarea
-          id="byteCode"
-          value={byteCode}
-          readOnly
-          rows="2"
-          className="w-full p-4 text-base border border-gray-300 rounded-md bg-gray-100 resize-none"
-        />
-      </div>
+      {/* Main Content */}
+      <div className="flex-grow p-6 flex flex-col">
+        {/* Warning Banner */}
+        <div className="p-4 mb-6 text-center text-white bg-red-600 rounded-md">
+          ⚠️ This is a pre-alpha release and is not fully functional. Use at
+          your own risk.
+        </div>
 
-      {/* Puzzle Hash Section */}
-      <div>
-        <label htmlFor="puzzleHash" className="block mb-2 font-bold text-lg">
-          Puzzle Hash
-        </label>
-        <div className="w-full gap-4">
-          <textarea
-            id="puzzleHash"
-            value={puzzleHash}
-            readOnly
-            rows="2"
-            className="w-full text-base border border-gray-300 rounded-md bg-gray-100 resize-none"
-          />
-          <button
-            onClick={handleCopy}
-            className="px-6 py-3 text-white bg-green-600 rounded-md hover:bg-green-700"
-          >
-            Copy
-          </button>
+        {/* Responsive Flex Container */}
+        <div className="flex flex-wrap gap-6 mb-6">
+          {/* Source Section */}
+          <div className="flex-1 min-w-[300px]">
+            <label htmlFor="source" className="block mb-2 font-bold text-lg">
+              Source
+            </label>
+            <textarea
+              id="source"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              placeholder="Enter source code..."
+              rows="10"
+              className="w-full p-4 text-base border border-gray-300 rounded-md resize-none"
+            />
+          </div>
+
+          {/* Parameters Section with Tabs */}
+          <div className="flex-1 min-w-[300px] flex flex-col">
+            <div>
+              <label htmlFor="source" className="block mb-2 font-bold text-lg">
+                Parameters
+              </label>
+              <div className="border-b border-gray-300 flex mb-4">
+                <button
+                  onClick={() => setActiveTab("parameters")}
+                  className={`flex-1 p-2 text-center ${
+                    activeTab === "parameters"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  Parameters
+                </button>
+                <button
+                  onClick={() => setActiveTab("curriedParameters")}
+                  className={`flex-1 p-2 text-center ${
+                    activeTab === "curriedParameters"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  Curried Parameters
+                </button>
+              </div>
+            </div>
+
+            {/* Form for Adding Parameters */}
+            <div className="flex items-center gap-4 mb-4">
+              <select
+                value={parameterType}
+                onChange={(e) => setParameterType(e.target.value)}
+                className="p-2 text-base border border-gray-300 rounded-md"
+              >
+                <option value="Int">Int</option>
+                <option value="Text">Text</option>
+              </select>
+              <input
+                type="text"
+                value={parameterValue}
+                onChange={(e) => setParameterValue(e.target.value)}
+                placeholder="Enter value"
+                className="flex-1 p-2 text-base border border-gray-300 rounded-md"
+              />
+              <button
+                onClick={() =>
+                  handleAddParameter(activeTab === "curriedParameters")
+                }
+                className="px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                Add
+              </button>
+            </div>
+
+            {/* Parameters or Curried Parameters Table */}
+            <div className="flex-grow overflow-auto">
+              <table className="table-auto w-full border-collapse border border-gray-300">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="border border-gray-300 px-4 py-2">Type</th>
+                    <th className="border border-gray-300 px-4 py-2">Value</th>
+                    <th className="border border-gray-300 px-4 py-2">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(activeTab === "parameters" ? parameters : curriedParameters)
+                    .length > 0 ? (
+                    (activeTab === "parameters"
+                      ? parameters
+                      : curriedParameters
+                    ).map((param, index) => (
+                      <tr key={index} className="text-center">
+                        <td className="border border-gray-300 px-4 py-2">
+                          {param.type}
+                        </td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          {param.value.toString()}
+                        </td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          <button
+                            onClick={() =>
+                              handleRemoveParameter(
+                                index,
+                                activeTab === "curriedParameters",
+                              )
+                            }
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <XCircleIcon className="w-5 h-5 inline" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="3"
+                        className="border border-gray-300 px-4 py-2 text-center text-gray-500 italic"
+                      >
+                        No {activeTab === "parameters" ? "" : "curried"}{" "}
+                        parameters added yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Output Section */}
+        <div className="flex-grow bg-black text-white rounded-md overflow-auto p-4">
+          <h2 className="text-lg font-bold text-gray-400 mb-4">Output</h2>
+          <div className="whitespace-pre-wrap text-sm">
+            {output || "No output yet."}
+            <br />
+            Puzzlehash: {puzzleHash || ""}
+            <br />
+            Compiled Program: {compiledProgram || ""}
+          </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white p-4 text-center mt-6">
+        <p className="text-sm">Version 0.0.1</p>
+        <a
+          href="https://github.com/KevinOnFrontEnd/clspweb"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-400 hover:text-blue-500"
+        >
+          GitHub Repository
+        </a>
+      </footer>
     </div>
   );
 }
