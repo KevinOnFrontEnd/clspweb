@@ -4,7 +4,7 @@ import { PlayIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 function App() {
   const [source, setSource] = useState("");
-  const [_, setByteCode] = useState("");
+  const [_, setByteCode] = useState(""); //eslint-disable-line no-unused-vars
   const [puzzleHash, setPuzzleHash] = useState("");
   const [parameterType, setParameterType] = useState("Int");
   const [parameterValue, setParameterValue] = useState("");
