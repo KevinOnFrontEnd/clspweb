@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import pkg from "clvm-lib";
-import { PlayIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import { PlayIcon } from "@heroicons/react/24/solid";
 import Parameters from "./components/Parameters";
 import Output from "./components/Output";
 import Footer from "./components/Footer";
@@ -110,7 +110,7 @@ function App() {
             {/* Copy Source Link */}
             <div className="text-right">
               <a
-                href="#"
+                href="#copy"
                 onClick={(e) => {
                   e.preventDefault(); // Prevent the default anchor behavior
                   navigator.clipboard.writeText(programSource);
