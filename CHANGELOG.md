@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Integrate with goby wallet.
+- Add new deploy button the enables a contract to be deployed using goby.
+
 ## [0.0.1] - 03/01/2025
 
 ### Added
