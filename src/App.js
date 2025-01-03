@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import pkg from "clvm-lib";
-import { PlayIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
+import { PlayIcon } from "@heroicons/react/24/solid";
 import Parameters from "./components/Parameters";
 import Output from "./components/Output";
 import Footer from "./components/Footer";
