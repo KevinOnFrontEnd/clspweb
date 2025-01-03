@@ -729,11 +729,6 @@ select {
   outline: 1px auto -webkit-focus-ring-color;
 }
 
-.my-4 {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -750,12 +745,12 @@ select {
   margin-right: 0.5rem;
 }
 
-.mt-6 {
-  margin-top: 1.5rem;
-}
-
 .mt-4 {
   margin-top: 1rem;
+}
+
+.mt-6 {
+  margin-top: 1.5rem;
 }
 
 .block {
@@ -1044,12 +1039,12 @@ select {
   color: rgb(59 130 246 / var(--tw-text-opacity, 1));
 }
 
-.hover\:text-red-700:hover {
-  --tw-text-opacity: 1;
-  color: rgb(185 28 28 / var(--tw-text-opacity, 1));
-}
-
 .hover\:text-gray-700:hover {
   --tw-text-opacity: 1;
   color: rgb(55 65 81 / var(--tw-text-opacity, 1));
+}
+
+.hover\:text-red-700:hover {
+  --tw-text-opacity: 1;
+  color: rgb(185 28 28 / var(--tw-text-opacity, 1));
 }

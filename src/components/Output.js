@@ -1,6 +1,6 @@
 import React from "react";
 
-const Output = ({ puzzleHash, compiledProgram, output }) => {
+const Output = ({ puzzleHash, compiledProgram, output, programCost }) => {
   return (
     <div className="flex flex-col h-full bg-gray-100">
       {/* Output Section */}
@@ -12,6 +12,8 @@ const Output = ({ puzzleHash, compiledProgram, output }) => {
           Puzzle Hash: {puzzleHash || ""}
           <br />
           Compiled Program: {compiledProgram || ""}
+          <br />
+          Cost: {programCost || ""}
         </div>
       </div>
     </div>

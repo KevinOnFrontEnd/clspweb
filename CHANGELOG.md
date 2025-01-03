@@ -8,6 +8,7 @@
 - Created wired up clvm-lib to compile source
 - Created simple Proof of concept interface to pass in chialisp parameters, curry in parameters
 - Tidy up project directory so tests can be added for each component.
+- Added support for sha256 parameters
 
 ### Changed
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import pkg from "clvm-lib";
 import { XCircleIcon } from "@heroicons/react/24/solid";
+import sha256 from "sha.js";
 
 function Parameters({ setProgramParameters, setProgramCurriedParameters }) {
   const [parameterType, setParameterType] = useState("Int");
@@ -12,7 +13,14 @@ function Parameters({ setProgramParameters, setProgramCurriedParameters }) {
 
   const handleAddParameter = (isCurried) => {
     let newParameter = {};
-    if (parameterType === "Text") {
+
+    if (parameterType === "SHA256") {
+      let generatedHash = sha256("sha256").update(parameterValue).digest();
+      newParameter = {
+        type: "SHA256",
+        value: Program.fromBytes(generatedHash),
+      };
+    } else if (parameterType === "Text") {
       newParameter = { type: "Text", value: Program.fromText(parameterValue) };
     } else if (parameterType === "Int") {
       const val = parseInt(parameterValue);
@@ -89,6 +97,7 @@ function Parameters({ setProgramParameters, setProgramCurriedParameters }) {
         >
           <option value="Int">Int</option>
           <option value="Text">Text</option>
+          <option value="SHA256">SHA256</option>
         </select>
         <input
           type="text"

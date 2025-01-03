@@ -14,6 +14,7 @@ function App() {
   const [compiledProgram, setCompiledProgram] = useState("");
   const [programParameters, setProgramParameters] = useState([]);
   const [programCurriedParameters, setProgramCurriedParameters] = useState([]); // Curried Parameters State
+  const [programCost, setProgramCost] = useState(0);
 
   //outputs
   const [_, setByteCode] = useState(""); //eslint-disable-line no-unused-vars
@@ -48,10 +49,12 @@ function App() {
           setCompiledProgram(compiledSource.value.toString());
           setByteCode(compiledSource.value.toString());
           setProgramOutput(output.value.toString());
+          setProgramCost(output.cost);
         } else {
           const output = compiledSource.run();
           setByteCode(compiledSource.toString());
           setProgramOutput(output.value.toString());
+          setProgramCost(output.cost);
         }
       } else {
         alert("No chialisp source code!");
@@ -60,6 +63,7 @@ function App() {
       setProgramOutput(ex.toString());
       setCompiledProgram("");
       setPuzzleHash("");
+      setProgramCost(0);
     }
   };
 
@@ -135,6 +139,7 @@ function App() {
             puzzleHash={puzzleHash}
             compiledProgram={compiledProgram}
             output={programOutput}
+            programCost={programCost}
           />
         </div>
       </div>
