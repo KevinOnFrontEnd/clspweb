@@ -133,7 +133,7 @@ function Parameters({ setProgramParameters, setProgramCurriedParameters }) {
                     <td className="border border-gray-300 px-4 py-2">
                       {param.type}
                     </td>
-                    <td className="border border-gray-300 px-4 py-2">
+                    <td className="border border-gray-300 px-4 py-2 truncate">
                       {param.value.toString()}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import pkg from "clvm-lib";
-import { PlayIcon } from "@heroicons/react/24/solid";
+import { PlayIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
 import Parameters from "./components/Parameters";
 import Output from "./components/Output";
 import Footer from "./components/Footer";
@@ -19,6 +19,9 @@ function App() {
   //outputs
   const [_, setByteCode] = useState(""); //eslint-disable-line no-unused-vars
   const [puzzleHash, setPuzzleHash] = useState("");
+
+  // Deploy modal state
+  const [showDeployDialog, setShowDeployDialog] = useState(false);
 
   const handleCompile = () => {
     try {
@@ -67,6 +70,10 @@ function App() {
     }
   };
 
+  const handleDeploy = () => {
+    setShowDeployDialog(false); // Close the dialog
+  };
+
   return (
     <div className="font-sans flex flex-col min-h-screen bg-gray-100">
       {/* Top Bar */}
@@ -75,13 +82,22 @@ function App() {
           <h1 className="w-100 text-lg font-bold">clspweb.dev</h1>
           <h2 className="text-sm text-green-300">Simple chialisp editor</h2>
         </div>
-        <button
-          onClick={handleCompile}
-          className="flex items-center px-6 py-2 bg-green-600 rounded-md hover:bg-green-700 transition duration-200"
-        >
-          <PlayIcon className="w-5 h-5 mr-2" />
-          Run
-        </button>
+        <div className="flex items-center">
+          <button
+            onClick={handleCompile}
+            className="flex items-center px-6 py-2 bg-green-600 rounded-md hover:bg-green-700 transition duration-200 mr-2"
+          >
+            <PlayIcon className="w-5 h-5 mr-2" />
+            Run
+          </button>
+          <button
+            onClick={() => setShowDeployDialog(true)}
+            className="flex items-center px-6 py-2 bg-red-600 rounded-md hover:bg-red-700 transition duration-200 disabled"
+            disabled
+          >
+            Deploy
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -98,8 +114,6 @@ function App() {
             <label htmlFor="source" className="block mb-2 font-bold text-lg">
               Source
             </label>
-
-            {/* Grouping Textarea and Copy Source Link in a Box */}
 
             {/* Textarea for Source Code */}
             <textarea
@@ -144,6 +158,32 @@ function App() {
         </div>
       </div>
       <Footer />
+
+      {/* Deploy Dialog */}
+      {showDeployDialog && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-bold mb-4">Deploy Contract</h2>
+            <p className="mb-6">
+              Are you sure you want to deploy this contract?
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowDeployDialog(false)}
+                className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400 mr-2"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeploy}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Deploy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
