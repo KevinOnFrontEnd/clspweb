@@ -74,6 +74,11 @@ function App() {
     setShowDeployDialog(false); // Close the dialog
   };
 
+  const IsGobyEnabled = () => {
+    const { chia } = window;
+    return Boolean(chia && chia.isGoby);
+  };
+
   return (
     <div className="font-sans flex flex-col min-h-screen bg-gray-100">
       {/* Top Bar */}
